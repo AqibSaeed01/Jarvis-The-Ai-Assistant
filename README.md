@@ -19,4 +19,16 @@ Jarvis the AI Assistant is developed to showcase the capabilities of AI in handl
 - **Information Retrieval**: Quick and relevant information fetching.
 - **Personalized Responses**: User-specific responses and interactions.
 
+## Usage
+- **Run the application using the command mentioned in the installation section**.
+
+- **Interact with Jarvis using voice commands or text input**.
+
+- **Enjoy the features provided by the AI assistant**.
+
+## Contributing
+- **Contributions are welcome! Please fork the repository and create a pull request with your improvements. For major changes, please open an issue first to discuss what you would like to change**.
+
+## License
+- **This project is licensed under the MIT License - see the LICENSE file for details**.
 
