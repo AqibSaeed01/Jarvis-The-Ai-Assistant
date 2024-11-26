@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JARVIS AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%;
+            background: black;
+            cursor: pointer; /* Show pointer cursor to indicate user interaction */
+        }
+        .main {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        .fade-in {
+            opacity: 1;
+        }
+        #response {
+            position: absolute;
+            color: white;
+            font-size: 2rem;
+            text-align: center;
+            display: none;
+        }
+        #response.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="main">
+        <video id="enhanced-video" src="JARVIS START UP enhanced.mp4"></video>
+        <video id="loop-video" src="JARVIS START UP loop.mp4" loop></video>
+        <audio id="audio" src="JARVIS START UP audio.mp3"></audio>
+        <div id="response">Hello, how can I assist you?</div>
+    </div>
+    <script>
+    const enhancedVideo = document.getElementById("enhanced-video");
+    const loopVideo = document.getElementById("loop-video");
+    const audio = document.getElementById("audio");
+    const responseDiv = document.getElementById("response");
+
+    // Web Speech API for Voice Recognition
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition;
+    let micActive = false; // Mic initially off
+
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+            console.log(`Heard: ${transcript}`);
+
+            if (transcript === "hey jarvis, turn on your mic") {
+                responseDiv.classList.add("show");
+                responseDiv.textContent = "I'm listening now!";
+                setTimeout(() => {
+                    responseDiv.classList.remove("show");
+                }, 5000);
+            } else if (transcript === "hey jarvis") {
+                responseDiv.classList.add("show");
+                responseDiv.textContent = "Hello, how can I assist you?";
+                const speech = new SpeechSynthesisUtterance("Hello, how can I assist you?");
+                window.speechSynthesis.speak(speech);
+                setTimeout(() => {
+                    responseDiv.classList.remove("show");
+                }, 5000);
+            } else if (transcript === "jarvis, turn off") {
+                responseDiv.classList.add("show");
+                responseDiv.textContent = "Microphone turned off.";
+                setTimeout(() => {
+                    responseDiv.classList.remove("show");
+                }, 5000);
+                recognition.stop();
+                micActive = false;
+            } else {
+                const speech = new SpeechSynthesisUtterance(`Searching...${transcript}`);
+                window.speechSynthesis.speak(speech);
+                window.open(`https://www.google.com/search?q=${transcript}`, "_blank");
+            }
+        };
+
+        recognition.onerror = (event) => console.error("Speech Recognition Error:", event.error);
+
+        recognition.onend = () => {
+            if (micActive) {
+                recognition.start();
+            }
+        };
+    } else {
+        console.error("Speech Recognition API not supported in this browser.");
+    }
+
+    // Wait for a user click to start everything
+    document.body.addEventListener('click', () => {
+        // Play enhanced video and audio
+        enhancedVideo.classList.add("fade-in");
+        enhancedVideo.play().catch((error) => console.error("Error playing enhanced video:", error));
+        audio.play().catch((error) => console.error("Error playing audio:", error));
+
+        // Start loop video after enhanced video ends
+        enhancedVideo.addEventListener("ended", () => {
+            enhancedVideo.classList.remove("fade-in");
+            loopVideo.classList.add("fade-in");
+            loopVideo.play().catch((error) => console.error("Error playing loop video:", error));
+        });
+
+        // Start speech recognition only after user clicks
+        if (SpeechRecognition && !micActive) {
+            recognition.start();
+            micActive = true;
+            console.log("Speech recognition started after user interaction.");
+        }
+    });
+</script>
+
+</body>
+</html>
